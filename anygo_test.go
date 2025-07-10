@@ -130,3 +130,15 @@ func TestOrElse(t *testing.T) {
 		t.Fatal("expected fallback value")
 	}
 }
+
+func TestErrorf(t *testing.T) {
+	err := anygo.Err[int](errors.New("bad"))
+	res := err.Errorf("context info %s", "some detail")
+	if !res.IsErr() || res.UnwrapOr(0) != 0 {
+		t.Fatal("expected error with context")
+	}
+	expectedMsg := "context info some detail: bad"
+	if resErr := res.UnwrapError().Error(); resErr != expectedMsg {
+		t.Fatalf("expected error message '%s', got '%s'", expectedMsg, resErr)
+	}
+}

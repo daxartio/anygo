@@ -59,6 +59,14 @@ func (r Result[T]) Unwrap() (T, error) {
 	return r.value, r.err
 }
 
+// UnwrapError returns the error if present, or nil if ok.
+func (r Result[T]) UnwrapError() error {
+	if r.IsOk() {
+		return nil
+	}
+	return r.err
+}
+
 // UnwrapOr returns the value if ok, or the default otherwise.
 //
 // Example:
@@ -173,6 +181,14 @@ func (r Result[T]) OrElse(f func() Result[T]) Result[T] {
 		return r
 	}
 	return f()
+}
+
+// Errorf adds context to the error if Result is Err.
+func (r Result[T]) Errorf(format string, a ...any) Result[T] {
+	if r.IsOk() {
+		return r
+	}
+	return Err[T](fmt.Errorf("%s: %w", fmt.Sprintf(format, a...), r.err))
 }
 
 // AndThen chains another Result-producing function on success.
